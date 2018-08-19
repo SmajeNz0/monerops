@@ -1,13 +1,13 @@
 <?php
 include(dirname(__FILE__). '/../../library.php');
-class moneropaymentModuleFrontController extends ModuleFrontController
+class arqmapaymentModuleFrontController extends ModuleFrontController
 {
   public $ssl = false;
   public $display_column_left = false;
   /**
    * @see FrontController::initContent()
    */
-  private $monero_daemon;
+  private $arqma_daemon;
 
  public function initContent() {
         parent::initContent();
@@ -20,22 +20,22 @@ class moneropaymentModuleFrontController extends ModuleFrontController
 		$actual = $this->retriveprice($c);
 		$payment_id  = $this->set_paymentid_cookie();
 
-    $address = Configuration::get('MONERO_ADDRESS');
-		$daemon_address = Configuration::get('MONERO_WALLET');
+    $address = Configuration::get('ARQMA_ADDRESS');
+		$daemon_address = Configuration::get('ARQMA_WALLET');
 
-		$uri = "monero:$address?tx_amount=$amount?tx_payment_id=$payment_id";
+		$uri = "arqma:$address?tx_amount=$amount?tx_payment_id=$payment_id";
 		$status = "Awaiting Confirmation...";
 
 
-		$this->monero_daemon = new Monero_Library($daemon_address .'/json_rpc',"",""); // example $daemon address 127.0.0.1:18081
+		$this->arqma_daemon = new Arqma_Library($daemon_address .'/json_rpc',"",""); // example $daemon address 127.0.0.1:18081
 
-		$integrated_address_method = $this->monero_daemon->make_integrated_address($payment_id);
+		$integrated_address_method = $this->arqma_daemon->make_integrated_address($payment_id);
 		$integrated_address = $integrated_address_method["integrated_address"];
 
 		if($this->verify_payment($payment_id, $amount))
 		{
 			$status = "Your Payment has been confirmed!";
-			header("Location: index.php?fc=module&module=monero&controller=validation");
+			header("Location: index.php?fc=module&module=arqma&controller=validation");
 
 		}
 
@@ -68,8 +68,8 @@ class moneropaymentModuleFrontController extends ModuleFrontController
 
 	public function retriveprice($c)
 				{
-								$xmr_price = Tools::file_get_contents('https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=BTC,USD,EUR,CAD,INR,GBP&extraParams=monero_woocommerce');
-								$price         = json_decode($xmr_price, TRUE);
+								$arq_price = Tools::file_get_contents('https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=BTC,USD,EUR,CAD,INR,GBP&extraParams=arqma_woocommerce'); //to chage
+								$price         = json_decode($arq_price, TRUE);
 
 								if ($c== 'USD') {
 												return $price['USD'];
@@ -93,9 +93,9 @@ class moneropaymentModuleFrontController extends ModuleFrontController
 
 	public function changeto($amount, $currency)
 	{
-		$xmr_live_price = $this->retriveprice($currency);
-		$new_amount     = $amount / $xmr_live_price;
-		$rounded_amount = round($new_amount, 12); //the Monero wallet can't handle decimals smaller than 0.000000000001
+		$arq_live_price = $this->retriveprice($currency);
+		$new_amount     = $amount / $arq_live_price;
+		$rounded_amount = round($new_amount, 12); //the arqma wallet can't handle decimals smaller than 0.000000000001
 		return $rounded_amount;
 	}
 
@@ -107,7 +107,7 @@ class moneropaymentModuleFrontController extends ModuleFrontController
        */
 
       $amount_atomic_units = $amount * 1000000000000;
-      $get_payments_method = $this->monero_daemon->get_payments($payment_id);
+      $get_payments_method = $this->arqma_daemon->get_payments($payment_id);
       if(isset($get_payments_method["payments"][0]["amount"]))
       {
 		if($get_payments_method["payments"][0]["amount"] >= $amount_atomic_units)

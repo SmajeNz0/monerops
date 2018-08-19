@@ -7,9 +7,9 @@
  *
  * @author Kacper Rowinski <krowinski@implix.com>
  * http://implix.com
- * Modified to work with monero-rpc wallet by Serhack and cryptochangements
+ * Modified to work with ArQmA-rpc wallet by ArQmA TEAM and cryptochangements
  */
-class Monero_Library
+class Arqma_Library
 {
     protected $url = null, $is_debug = false, $parameters_structure = 'array';
     private $username;
@@ -225,7 +225,7 @@ class Monero_Library
     }
 
     /*
-     * The following functions can all be called to interact with the Monero RPC wallet
+     * The following functions can all be called to interact with the ArQmA RPC wallet
      * They will majority of them will return the result as an array
      * Example: $daemon->address(); where $daemon is an instance of this class, will return the wallet address as string within an array
      */
