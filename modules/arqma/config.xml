@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-	<name>monero</name>
+	<name>arqma</name>
 	<displayName><![CDATA[ArQmA Payments]]></displayName>
 	<version><![CDATA[0.1.0]]></version>
 	<description><![CDATA[Module for accepting payments by ArQmA]]></description>
