@@ -66,30 +66,25 @@ class arqmapaymentModuleFrontController extends ModuleFrontController
 					return $payment_id;
 				}
 
+	
 	public function retriveprice($c)
 				{
-								$arq_price = Tools::file_get_contents('https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=BTC,USD,EUR,CAD,INR,GBP&extraParams=arqma_woocommerce'); //to chage
-								$price         = json_decode($arq_price, TRUE);
-
-								if ($c== 'USD') {
-												return $price['USD'];
-								}
-								if ($c== 'EUR') {
-												return $price['EUR'];
-								}
-								if ($c== 'CAD'){
-												return $price['CAD'];
-								}
-								if ($c== 'GBP'){
-												return $price['GBP'];
-								}
-								if ($c== 'INR'){
-												return $price['INR'];
-								}
-								else{
-												//return $price['USD'];
-								}
+								# available currencies at crex24.com : EUR / USD / JPY / CNY / RUB
+								if(in_array($c, ['EUR', 'USD', 'JPY' , 'CNY' , 'RUB'], TRUE)){ 
+									$trading_fee = 0.10/100; # actual crex24.com trading fee
+									$base_url = 'https://api.crex24.com/v2/public/orderBook?instrument=BTC-';
+									$arq_btc_req = Tools::file_get_contents('https://api.crex24.com/v2/public/orderBook?instrument=ARQ-BTC');
+									$arq_btc_orderbook = json_decode($arq_btc_req, TRUE);
+									$btc_ccy_req = Tools::file_get_contents($base_url . $c );
+									$btc_ccy_orderbook = json_decode($btc_ccy_req, TRUE);
+									$arq_btc_bid = $arq_btc_orderbook['buyLevels']['0']['price'] * (1-$trading_fee); # Sell ARQ for BTC - trading fee
+									$btc_ccy_bid = $btc_ccy_orderbook['buyLevels']['0']['price'] * (1-$trading_fee); # Sell BTC for CCY - trading fee
+									return $arq_btc_bid * $btc_ccy_bid; # return cross-rate 1 $ARQ = x CCY
+									} else {
+												return false;
+									}
 				}
+	
 
 	public function changeto($amount, $currency)
 	{
